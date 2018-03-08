@@ -1,0 +1,14 @@
+[Hook]
+crossfire.exe=0
+BackgroundDownloader.exe=0
+crossproxy.exe=0
+leagueclient.exe=0
+tgame.exe=0
+KartRider.exe=0
+microsoftedge.exe=0
+microsoftedgecp.exe=0
+[Inject]
+p0=crossfire.exe
+p1=crossproxy.exe
+p2=microsoftedge.exe
+p3=microsoftedgecp.exe
