@@ -1,0 +1,29 @@
+#!/bin/bash
+
+[[ -f /etc/mail-exec.rc ]] && . /etc/mail-exec.rc
+[[ -f ~/.mail-exec.rc ]] && . ~/.mail-exec.rc
+[[ -z "$send_from" ]] && { echo -n "Your smtp authorization email adress (find it at /etc/ssmtp/ssmtp.conf): " >&2; read send_from; }
+[[ -z "$send_to" ]] && { echo -n "Email address you want to notify: " >&2; read send_to;}
+
+# help message
+USAGE="Usage: $0 [COMMAND]"
+
+if [ $# == 0 ]
+then
+    echo -e $USAGE
+    exit
+fi
+
+# execute and send email
+if ("$@" 2>/tmp/mail-exec.err)
+then
+    Subject="Command succeeded: $@"
+    Details="Command: $@ \nPid: $$ \nMachine: `hostname`\nFinish at:`date +%H:%M:%S,\ %Y%m%d`\n"
+else
+    Subject="Command failed: $@"
+    err_msg=$(</tmp/mail-exec.err)
+    printf "$err_msg\n" >&2
+    Details="Command: $@ \nPid: $$ \nMachine: `hostname`\nFinish at:`date +%H:%M:%S,\ %Y%m%d`\nError details:\n$err_msg\n"
+fi
+
+printf "From: $send_from\nTo: $send_to\nSubject: $Subject\n\n$Details\n" | ssmtp -t

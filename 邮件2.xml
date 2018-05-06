@@ -1,0 +1,8 @@
+#!/bin/sh
+# automail.sh
+DIR=/root/owinux
+mailcontent=$DIR/mailcontent
+> "$mailcontent"
+echo -e "owinux，您好!\n" >> $mailcontent
+echo -e "\t附件为 `date +%Y-%m-%d` 报警，敬请查收。" >> $mailcontent
+cat mailcontent | /usr/bin/mutt -s "访问日检报告" -a /root/owinux/report.xls 378950465@qq.com -c owinux@yeah.net -c owinux@sina.com

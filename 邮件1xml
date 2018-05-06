@@ -1,0 +1,18 @@
+#!/bin/bash
+#日志文件
+logfile=/usr/local/nginx/logs/access.log
+  
+#开始时间
+start_time=`date -d"$last_minutes minutes ago" +"%H:%M:%S"`
+  
+#结束时间
+stop_time=`date +"%H:%M:%S"`
+  
+#过滤出单位之间内的日志并统计最高ip数
+tac $logfile/access.log | awk -v st="$start_time" -v et="$stop_time" '{t=substr($4,RSTART+14,21);if(t>=st && t<=et) {print $0}}' \
+| awk '{print $1}' | sort | uniq -c | sort -nr > $logfile/log_ip_top10
+ip_top=`cat $logfile/log_ip_top10 | head -1 | awk '{print $1}'`
+# 单位时间[1分钟]内单ip访问次数超过200次，则触发邮件报警
+if [[ $ip_top -gt 3 ]];then
+  /opt/tools/send_mail.py &
+fi
